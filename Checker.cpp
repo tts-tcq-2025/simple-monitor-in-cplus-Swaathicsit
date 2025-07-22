@@ -3,25 +3,27 @@
 using namespace std;
 
 bool batteryIsOk(float temperature, float soc, float chargeRate) {
-    // Check Temperature
-    if(temperature < 0 || temperature > 45) {
-        cout << "Temperature out of range!\n";
-        return false;
-    }
-    
-    // Check State of Charge (SOC)
-    if(soc < 20 || soc > 80) {
-        cout << "State of Charge out of range!\n";
-        return false;
+    // Simplified checks using an array of conditions to reduce complexity
+    struct Condition {
+        bool (*check)(float);
+        const char* message;
+    };
+
+    // Define checks and corresponding messages
+    Condition checks[] = {
+        { [](float value) { return value < 0 || value > 45; }, "Temperature out of range!" },
+        { [](float value) { return value < 20 || value > 80; }, "State of Charge out of range!" },
+        { [](float value) { return value > 0.8; }, "Charge Rate out of range!" }
+    };
+
+    // Check all conditions
+    for (auto& condition : checks) {
+        if (condition.check(temperature) || condition.check(soc) || condition.check(chargeRate)) {
+            cout << condition.message << endl;
+            return false;
+        }
     }
 
-    // Check Charge Rate
-    if(chargeRate > 0.8) {
-        cout << "Charge Rate out of range!\n";
-        return false;
-    }
-
-    // All checks passed
     return true;
 }
 
